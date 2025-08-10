@@ -3,6 +3,7 @@ package otel
 import (
 	"okgo/logger"
 
+	"github.com/go-logr/zapr"
 	"go.opentelemetry.io/otel"
 	"go.opentelemetry.io/otel/propagation"
 	"go.opentelemetry.io/otel/sdk/log"
@@ -44,11 +45,9 @@ func initGlobalLoggerProvider(serviceName string, e log.Exporter, logger *logger
 		),
 	)
 
-	// Note: zap doesn't directly implement logr.Logger interface required by otel.SetLogger
-	// If you need OpenTelemetry to use zap for its internal logging, consider using a bridge
-	// like "github.com/go-logr/zapr" to create a logr.Logger from zap.Logger
-	// For now, OpenTelemetry will use its default logger
-	_ = logger // Mark as used to avoid unused parameter warning
+	// Use zapr to bridge zap logger to logr.Logger interface for OpenTelemetry internal logging
+	logrLogger := zapr.NewLogger(logger.Log)
+	otel.SetLogger(logrLogger)
 	
 	return lp
 }
