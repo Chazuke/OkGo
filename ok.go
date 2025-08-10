@@ -2,24 +2,33 @@ package okgo
 
 import (
 	"okgo/service"
-	"os"
 
-	"github.com/rs/zerolog"
 	"github.com/spf13/cobra"
+	"go.uber.org/zap"
+	"go.uber.org/zap/zapcore"
 )
 
 const logo = `
-   ____  __   ______    
-  / __ \/ /__/ ____/___ 
+   ____  __   ______
+  / __ \/ /__/ ____/___
  / / / / //_/ / __/ __ \
 / /_/ / ,< / /_/ / /_/ /
-\____/_/|_|\____/\____/ 
+\____/_/|_|\____/\____/
 `
 
-var log zerolog.Logger
+var log *zap.Logger
 
 func init() {
-	log = zerolog.New(os.Stdout).With().Timestamp().Logger()
+	// Create a production logger with timestamp
+	config := zap.NewProductionConfig()
+	config.EncoderConfig.TimeKey = "timestamp"
+	config.EncoderConfig.EncodeTime = zapcore.ISO8601TimeEncoder
+	
+	var err error
+	log, err = config.Build()
+	if err != nil {
+		panic(err)
+	}
 }
 
 func New(version string) *cobra.Command {

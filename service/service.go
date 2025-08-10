@@ -43,7 +43,7 @@ func new[T Service](service T, projectId string, logger *logger.OkGoLogger) (*Pr
 		service: service,
 	}
 
-	s.Fiber.Use(otelfiber.Middleware(WithServerName(service.Name()))))
+	s.Fiber.Use(otelfiber.Middleware())
 
 	return s, nil
 }
